@@ -21464,28 +21464,42 @@
 	    getInitialState: function getInitialState() {
 	        return {
 	            selectedItems: [],
-	            list: ['Apples', 'Avocados', 'Bananas', 'Berries', 'Cherries', 'Grapefruit', 'Grapes', 'Kiwis', 'Lemons', 'Melon', 'Oranges', 'Peaches', 'Nectarines', 'Pears', 'Plums', 'Asparagus', 'Broccoli', 'Carrots', 'Cauliflower', 'Celery', 'Corn', 'Cucumbers', 'Lettuce', 'Mushrooms', 'Onions', 'Peppers', 'Potatoes', 'Spinach', 'Squash', 'Zucchini', 'Tomatoes'],
-	            searchResults: [],
+	            listToSearch: ['Apples', 'Avocados', 'Bananas', 'Berries', 'Cherries', 'Grapefruit', 'Grapes', 'Kiwis', 'Lemons', 'Melon', 'Oranges', 'Peaches', 'Nectarines', 'Pears', 'Plums', 'Asparagus', 'Broccoli', 'Carrots', 'Cauliflower', 'Celery', 'Corn', 'Cucumbers', 'Lettuce', 'Mushrooms', 'Onions', 'Peppers', 'Potatoes', 'Spinach', 'Squash', 'Zucchini', 'Tomatoes'],
+	            listToShow: [],
 	            placeholder: 'Search here...'
 	        };
 	    },
+	    componentWillMount: function componentWillMount() {
+	        this.setState({ listToShow: this.state.listToSearch });
+	    },
 	    addToList: function addToList(i) {
 	        var selectedArray = this.state.selectedItems;
-	        var originalArray = this.state.list;
+	        var originalArray = this.state.listToSearch;
 	        selectedArray.push(originalArray[i]);
 	        originalArray.splice(i, 1);
-	        this.setState({ selectedItems: selectedArray, list: originalArray });
+	        this.setState({ selectedItems: selectedArray, listToSearch: originalArray });
 	    },
 	    deleteFromList: function deleteFromList(i) {
 	        var selectedArray = this.state.selectedItems;
-	        var originalArray = this.state.list;
+	        var originalArray = this.state.listToSearch;
 	        originalArray.push(selectedArray[i]);
 	        selectedArray.splice(i, 1);
-	        this.setState({ selectedItems: selectedArray, list: originalArray });
+	        this.setState({ selectedItems: selectedArray, listToSearch: originalArray });
 	    },
 	    search: function search(val) {
-	        if (this.state.list.indexOf(val) !== -1) {
-	            console.log('There it is');
+	        var originalArray = this.state.listToSearch;
+	        var matchesArray = [];
+	        this.state.listToSearch.map(function (item, i) {
+	            var itemToCompare = item.toLowerCase();
+	            if (itemToCompare.includes(val)) {
+	                matchesArray.push(itemToCompare);
+	                console.log("Matches: ", matchesArray);
+	            }
+	        });
+	        if (matchesArray.length === 0) {
+	            this.setState({ listToShow: ['No matches'] });
+	        } else {
+	            this.setState({ listToShow: matchesArray });
 	        }
 	    },
 	    eachSelectedItem: function eachSelectedItem(text, i) {
@@ -21523,7 +21537,7 @@
 	                _react2.default.createElement(
 	                    "ul",
 	                    { className: "collection" },
-	                    this.state.list.map(this.eachItem)
+	                    this.state.listToShow.map(this.eachItem)
 	                )
 	            )
 	        );

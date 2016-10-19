@@ -9,7 +9,7 @@ const Layout = React.createClass({
     getInitialState() {
         return {
             selectedItems: [],
-            list: [
+            listToSearch: [
                 'Apples',
                 'Avocados',
                 'Bananas',
@@ -42,31 +42,46 @@ const Layout = React.createClass({
                 'Zucchini',
                 'Tomatoes'
             ],
-            searchResults: [
+            listToShow: [
             ],
             placeholder: 'Search here...'
         };
     },
 
+    componentWillMount() {
+        this.setState({ listToShow: this.state.listToSearch });
+    },
+
     addToList(i) {
         let selectedArray = this.state.selectedItems;
-        let originalArray = this.state.list;
+        let originalArray = this.state.listToSearch;
         selectedArray.push(originalArray[i]);
         originalArray.splice(i, 1);
-        this.setState({selectedItems: selectedArray, list: originalArray, })
+        this.setState({ selectedItems: selectedArray, listToSearch: originalArray, });
     },
 
     deleteFromList(i) {
         let selectedArray = this.state.selectedItems;
-        let originalArray = this.state.list;
+        let originalArray = this.state.listToSearch;
         originalArray.push(selectedArray[i]);
         selectedArray.splice(i, 1);
-        this.setState({selectedItems: selectedArray, list: originalArray, })
+        this.setState({ selectedItems: selectedArray, listToSearch: originalArray, });
     },
 
     search(val) {
-        if( this.state.list.indexOf(val) !== -1) {
-            console.log('There it is');   
+        const originalArray = this.state.listToSearch;
+        let matchesArray = [];
+        this.state.listToSearch.map(function(item, i) {
+            const itemToCompare = item.toLowerCase();
+            if(itemToCompare.includes(val)) {
+                matchesArray.push(itemToCompare);
+                console.log("Matches: ", matchesArray);
+            }
+        });
+        if(matchesArray.length === 0) {
+            this.setState({ listToShow: ['No matches'] });
+        } else {
+            this.setState({ listToShow: matchesArray });
         }
     },
 
@@ -99,7 +114,7 @@ const Layout = React.createClass({
                 <div>
                     <ul class="collection">
                         {   
-                            this.state.list.map(this.eachItem)
+                            this.state.listToShow.map(this.eachItem)
                         }
                     </ul>
                 </div>
