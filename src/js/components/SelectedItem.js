@@ -3,6 +3,7 @@ import React from "react";
 const SelectedItem = React.createClass({
 
     deleteItem() {
+        console.log(this.props.index);
         this.props.deleteFromList(this.props.index);
     },
 

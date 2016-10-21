@@ -1,5 +1,5 @@
 import React from "react";
-
+import _ from "lodash";
 import SearchBox from "./SearchBox";
 import Item from "./Item";
 import SelectedItem from "./SelectedItem";
@@ -7,87 +7,121 @@ import SelectedItem from "./SelectedItem";
 const Layout = React.createClass({
 
     getInitialState() {
+        const list = [
+                    'Asparagus',
+                    'Broccoli',
+                    'Carrots',
+                    'Cauliflower',
+                    'Celery',
+                    'Corn',
+                    'Cucumbers',
+                    'Lettuce',
+                    'Mushrooms',
+                    'Onions',
+                    'Peppers',
+                    'Potatoes',
+                    'Spinach',
+                    'Squash',
+                    'Zucchini',
+                    'Tomatoes',
+                    'Apples',
+                    'Avocados',
+                    'Bananas',
+                    'Berries',
+                    'Cherries',
+                    'Grapefruit',
+                    'Grapes',
+                    'Kiwis',
+                    'Lemons',
+                    'Limes',
+                    'Melon',
+                    'Oranges',
+                    'Peaches',
+                    'Nectarines',
+                    'Pears',
+                    'Plums',
+                    'Bagels',
+                    'Chip dip',
+                    'English muffins',
+                    'Eggs',
+                    'Fruit juice',
+                    'Hummus',
+                    'Ready-bake breads',
+                    'Tofu',
+                    'Tortillas',
+                    'Burritos',
+                    'Fish sticks',
+                    'Ice cream',
+                    'Sorbet',
+                    'Juice concentrate',
+                    'Pizza',
+                    'Popsicles',
+                    'Fries',
+                    'TV dinners',
+                    'Vegetables',
+                    'Veggie burgers'
+                ];
+        let indexedObj = new Object();
+        list.map(function(value, index) {
+            indexedObj[index] = value;
+        });
         return {
-            selectedItems: [],
-            listToSearch: [
-                'Apples',
-                'Avocados',
-                'Bananas',
-                'Berries',
-                'Cherries',
-                'Grapefruit',
-                'Grapes',
-                'Kiwis',
-                'Lemons',
-                'Melon',
-                'Oranges',
-                'Peaches',
-                'Nectarines',
-                'Pears',
-                'Plums',
-                'Asparagus',
-                'Broccoli',
-                'Carrots',
-                'Cauliflower',
-                'Celery',
-                'Corn',
-                'Cucumbers',
-                'Lettuce',
-                'Mushrooms',
-                'Onions',
-                'Peppers',
-                'Potatoes',
-                'Spinach',
-                'Squash',
-                'Zucchini',
-                'Tomatoes'
-            ],
-            listToShow: [
-            ],
+            selectedItems: {},
+            listToSearch: indexedObj,
+            listToShow: indexedObj,
+            listLength: list.length,
             placeholder: 'Search here...'
         };
     },
 
     componentWillMount() {
-        this.setState({ listToShow: this.state.listToSearch });
+
     },
 
     addToList(i) {
-        let selectedArray = this.state.selectedItems;
-        let originalArray = this.state.listToSearch;
-        selectedArray.push(originalArray[i]);
-        originalArray.splice(i, 1);
-        this.setState({ selectedItems: selectedArray, listToSearch: originalArray, });
+        let selectedObj = this.state.selectedItems;
+        let originalObj = this.state.listToSearch;
+        // let matchesObj = this.state.listToShow;
+        selectedObj[i] = originalObj[i];
+        // matchesObj[i] = originalObj[i];
+        delete originalObj[i];
+        this.setState({ selectedItems: selectedObj,
+                        listToSearch: originalObj });
     },
 
     deleteFromList(i) {
-        let selectedArray = this.state.selectedItems;
-        let originalArray = this.state.listToSearch;
-        originalArray.push(selectedArray[i]);
-        selectedArray.splice(i, 1);
-        this.setState({ selectedItems: selectedArray, listToSearch: originalArray, });
+        let selectedObj = this.state.selectedItems;
+        let originalObj = this.state.listToSearch;
+        // let matchesObj = this.state.listToShow;
+        originalObj[i] = selectedObj[i];
+        delete selectedObj[i];
+        // delete matchesObj[i];
+        this.setState({ selectedItems: selectedObj,
+                        listToSearch: originalObj });
     },
 
     search(val) {
-        const originalArray = this.state.listToSearch;
-        let matchesArray = [];
-        this.state.listToSearch.map(function(item, i) {
-            const itemToCompare = item.toLowerCase();
-            if(itemToCompare.includes(val)) {
-                matchesArray.push(itemToCompare);
-                console.log("Matches: ", matchesArray);
+        // Convert list to an indexed object
+        const originalObj = this.state.listToSearch;
+        let matchesObj = {};
+        for (let key in this.state.listToSearch) {
+            const itemToCompare = this.state.listToSearch[key];
+            if(itemToCompare.toLowerCase().includes(val)) {
+                matchesObj[key] = itemToCompare;
+                console.log("Matches: ", matchesObj);
             }
-        });
-        if(matchesArray.length === 0) {
-            this.setState({ listToShow: ['No matches'] });
+        };
+        if(Object.keys(matchesObj).length === 0) {
+            this.setState({ listToShow: { nomatches: "No matches" } });
         } else {
-            this.setState({ listToShow: matchesArray });
+            this.setState({ listToShow: matchesObj });
         }
     },
 
     eachSelectedItem(text, i) {
         return (
-            <SelectedItem key={i} index={i} value={ text } deleteFromList={ this.deleteFromList } />
+            <SelectedItem key={i} index={i} value={ text }
+            deleteFromList={ this.deleteFromList } />
         )
     },
 
@@ -98,6 +132,19 @@ const Layout = React.createClass({
     },
 
     render() {
+
+        let selectedListToRender = []; 
+        for (const key in this.state.selectedItems) {
+            console.log('SELECTED-> ', key, ':', this.state.selectedItems[key]);
+            selectedListToRender.push(this.eachSelectedItem(this.state.selectedItems[key], key));
+        };
+
+        let listToRender = []; 
+        for (const key in this.state.listToShow) {
+            console.log('NOT SELECTED-> ', key, ':', this.state.listToShow[key]);
+            listToRender.push(this.eachItem(this.state.listToShow[key], key));
+        };
+
         return ( 
             <div class="main-container">
                 <div>
@@ -108,13 +155,27 @@ const Layout = React.createClass({
                 </div>
                 <div>
                     {
-                        this.state.selectedItems.map(this.eachSelectedItem)
+                        selectedListToRender
                     }
                 </div>
                 <div>
                     <ul class="collection">
                         {   
-                            this.state.listToShow.map(this.eachItem)
+                            // JSON.parse(this.state.listToShow, (key, value) => this.eachItem)
+                            listToRender
+                            // _.forEach(this.state.listToShow, function(value, index) {
+                            //     self.eachItem(value, index);
+                            //     console.log(value, index);
+                            // })
+
+                            // for (let i = 0; i < listLength; i++) {
+                            //     this.eachItem(this.state.listToShow[index], index);
+                            // }
+                            
+                            // Object.keys(this.state.listToShow).forEach(function(value, index) {
+                            //     console.log(value, ': ', index);
+                            //     self.eachItem(value, index);
+                            // })
                         }
                     </ul>
                 </div>

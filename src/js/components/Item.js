@@ -3,24 +3,26 @@ import React from "react";
 const Item = React.createClass({
 	
 	getInitialState() {
-		return { isActive: false };
+		return { onHover: false };
 	},
 
 	toggleActiveClass() {
-		this.setState({ isActive: !this.state.isActive });
+		this.setState({ onHover: !this.state.onHover });
 	},
 
 	addItem() {
+		console.log(this.props.index);
 		this.props.addToList(this.props.index);
 	},
 
     render() {
         return ( 
-        	<li onMouseEnter={ this.toggleActiveClass }
-        		onMouseLeave={ this.toggleActiveClass }
+        	<li onMouseOver={ this.toggleActiveClass }
+        		onMouseOut={ this.toggleActiveClass }
         		onClick={ this.addItem }
-                class={ this.state.isActive === true ? 'collection-item active' : 'collection-item' }
+                class={ this.state.onHover === true ? 'collection-item active' : 'collection-item' }
                 ref="item">
+                <span>{ this.props.index }. </span>
                 { this.props.value }
             </li>
         );
